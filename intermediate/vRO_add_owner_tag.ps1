@@ -1,5 +1,6 @@
 <#
 	This script extract all VM of a specific cluster to set the current owner of every VM.
+	New-CustomAttribute -Name "vm.owner" -TargetType VirtualMachine
 #>
 
 function Handler($context, $inputs) {
