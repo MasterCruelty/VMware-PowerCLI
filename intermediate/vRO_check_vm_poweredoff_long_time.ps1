@@ -1,3 +1,7 @@
+<#
+	This script checks if there are Vms poweredoff since 6 months ago.
+#>
+
 function Handler($context, $inputs) {
     $inputsString = $inputs | ConvertTo-Json -Compress
 

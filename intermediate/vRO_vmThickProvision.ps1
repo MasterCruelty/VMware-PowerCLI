@@ -1,3 +1,7 @@
+<#
+	This script checks if there are VMs with Thick Provision in a specific Cluster.
+#>
+
 function Handler($context, $inputs) {
     $inputsString = $inputs | ConvertTo-Json -Compress
 
