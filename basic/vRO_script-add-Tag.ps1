@@ -1,3 +1,8 @@
+<#
+	This script checks if there are Vms without a default tag.
+	if found, it assign the default tag to every VM without it.
+#>
+
 function Handler($context, $inputs) {
   $inputsString = $inputs | ConvertTo-Json -Compress
   
