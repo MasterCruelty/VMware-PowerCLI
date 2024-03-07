@@ -1,3 +1,8 @@
+<#
+	This script checks if there are Vms outside a specific folder in a specific cluster.
+	If found, it sends an email for notification.
+#>
+
 function Handler($context, $inputs) {
     $inputsString = $inputs | ConvertTo-Json -Compress
 
