@@ -13,10 +13,11 @@ function Handler($context, $inputs) {
     Connect-VIServer -Server $inputs.vcenter -User $inputs.user -Password $inputs.password
     
     $folder = Get-Folder -Name "<folder-name>"
-    $vmInFolder = $folder | Get-VM | Where-Object {$_.Folder.Name -eq "<folder-name>"} | Select Name
+    $vmInFolder = $folder | Get-VM | Where-Object {$_.Folder.Name -eq "<folder-name>"}
     $result = ""
     foreach($item in $vmInFolder){
-        $result += "$item`r`n"
+        $owner = $item | Get-Annotation -Name 'vm.owner' | Select Value
+        $result += "$($item.Name) [owner] $owner`r`n"
     }
     if($result -ne ""){
         send-MailMessage -To <receiver-1>,<receiver-2> -From <sender> -Subject "[Check VM] Workflow vRO " -Body "The following VMs are outside specific folder:`r`n$result" -SmtpServer <ip-smtp-server> -Port 25
