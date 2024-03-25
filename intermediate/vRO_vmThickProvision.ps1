@@ -18,7 +18,8 @@ function Handler($context, $inputs) {
     $totalSpace1 = 0
     foreach($item in $vmThick1){
         $totalSpace1 += $($item.CapacityGB)
-        if( $($item.VMOwner).Contains('.')){
+        $owner = $item | Get-Annotation -Name 'vm.owner' | Select Value
+        if( $owner -ne ''){
             $result1 += "`r`n$($item.VM) [occupied space] $($item.CapacityGB) GB [owner] $($item.VMOwner)`r`n"
         }else{
             $result1 += "`r`n$($item.VM) [occupied space] $($item.CapacityGB) GB`r`n"
