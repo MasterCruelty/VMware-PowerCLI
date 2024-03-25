@@ -18,7 +18,8 @@ function Handler($context, $inputs) {
     $vm1 =  Get-VM -Location $cluster | Where-Object {$_.ResourcePool.Id -eq $rp.Id -and !($_.Name -like "vCLS*")}
     $result1 = ""
     foreach($item in $vm1){
-        if($($item.CustomFields.Item("vm.owner")) -ne ""){
+        $owner = $item | Get-Annotation -Name 'vm.owner' | Select Value
+        if( $owner -ne ""){
             $result1 += "$($item.Name) [proprietario] $($item.CustomFields.Item("vm.owner"))`r`n"
         }else{
             $result1 += "$($item.Name)`r`n"
