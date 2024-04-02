@@ -17,9 +17,10 @@ function Handler($context, $inputs) {
     foreach($item in $vmLongTime1){ 
         try{
             if(([datetime]::parseexact($($item.Value),'MM/dd/yyyy HH:mm:ss',$null)) -le (get-date).AddDays(-180)) {
+                $owner = $item.AnnotatedEntity | Get-Annotation -Name 'vm.owner' | Select Value
                 $provisionedSpace = [math]::Round((Get-VM -Name $item.AnnotatedEntity).UsedSpaceGB)                
                 $totalSpace1 += $provisionedSpace
-                $result1 += "`r`n$($item.AnnotatedEntity) [last poweroff] $($item.Value) [occupied space] $provisionedSpace GB`r`n"
+                $result1 += "`r`n$($item.AnnotatedEntity) [last poweroff] $($item.Value) [occupied space] $provisionedSpace GB [owner] $($owner.Value)`r`n"
             }
         } catch{ Write-Output "PowerOff not found"}
     }
