@@ -12,7 +12,7 @@ function Handler($context, $inputs) {
     Connect-VIServer -Server $inputs.vcenter -User $inputs.user -Password $inputs.password
 
     $vmLongTime1 = Get-VM -Location "<cluster-name>" | Where-Object {$_.PowerState -eq 'PoweredOff'} | Get-Annotation -CustomAttribute "PowerOff.From" | Select AnnotatedEntity, Value
-    $result1 = ""
+    $result1 = "VM;owner;last poweroff;occupied space GB`r`n"
     $totalSpace1 = 0
     foreach($item in $vmLongTime1){ 
         try{
@@ -20,7 +20,7 @@ function Handler($context, $inputs) {
                 $owner = $item.AnnotatedEntity | Get-Annotation -Name 'vm.owner' | Select Value
                 $provisionedSpace = [math]::Round((Get-VM -Name $item.AnnotatedEntity).UsedSpaceGB)                
                 $totalSpace1 += $provisionedSpace
-                $result1 += "`r`n$($item.AnnotatedEntity) [last poweroff] $($item.Value) [occupied space] $provisionedSpace GB [owner] $($owner.Value)`r`n"
+                $result1 += "$($item.AnnotatedEntity);$($owner.Value);$($item.Value);$provisionedSpace;`r`n"
             }
         } catch{ Write-Output "PowerOff not found"}
     }
