@@ -11,7 +11,8 @@ function Handler($context, $inputs) {
     #Connection to Vcenter
     Connect-VIServer -Server $inputs.vcenter -User $inputs.user -Password $inputs.password
 
-    $vmLongTime1 = Get-VM -Location "<cluster-name>" | Where-Object {$_.PowerState -eq 'PoweredOff'} | Get-Annotation -CustomAttribute "PowerOff.From" | Select AnnotatedEntity, Value
+    $vmsWithTag = Get-VM -Tag "exclude-vms"
+    $vmLongTime1 = Get-VM -Location "<cluster-name>" | Where-Object {$_.PowerState -eq 'PoweredOff' -and $_ -notin $vmsWithTag} | Get-Annotation -CustomAttribute "PowerOff.From" | Select AnnotatedEntity, Value
     $result1 = "VM;owner;last poweroff;occupied space GB`r`n"
     $totalSpace1 = 0
     foreach($item in $vmLongTime1){ 
