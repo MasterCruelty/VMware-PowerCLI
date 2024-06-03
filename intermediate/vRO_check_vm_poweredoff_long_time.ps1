@@ -10,10 +10,14 @@ function Handler($context, $inputs) {
   
     #Connection to Vcenter
     Connect-VIServer -Server $inputs.vcenter -User $inputs.user -Password $inputs.password
-
+    
+    #tag which exclude vms from this check
     $vmsWithTag = Get-VM -Tag "exclude-vms"
     $vmLongTime1 = Get-VM -Location "<cluster-name>" | Where-Object {$_.PowerState -eq 'PoweredOff' -and $_ -notin $vmsWithTag} | Get-Annotation -CustomAttribute "PowerOff.From" | Select AnnotatedEntity, Value
-    $result1 = "VM;owner;last poweroff;occupied space GB`r`n"
+    #path for exporting and sending csv via email
+    $pathcsv1 = "/tmp/vm-poweroff.csv"
+    #initialize object which is need for exporting csv
+    $result1Object = @()
     $totalSpace1 = 0
     foreach($item in $vmLongTime1){ 
         try{
@@ -21,13 +25,20 @@ function Handler($context, $inputs) {
                 $owner = $item.AnnotatedEntity | Get-Annotation -Name 'vm.owner' | Select Value
                 $provisionedSpace = [math]::Round((Get-VM -Name $item.AnnotatedEntity).UsedSpaceGB)                
                 $totalSpace1 += $provisionedSpace
-                $result1 += "$($item.AnnotatedEntity);$($owner.Value);$($item.Value);$provisionedSpace;`r`n"
+                #fill the object at every iteration
+                $result1Object += [PSCustomObject]@{
+                    VM = $item.AnnotatedEntity.Name
+                    Owner = $owner.Value
+                    "Last poweroff" = $item.Value
+                    "Occupied space GB" = $provisionedSpace
+                }
             }
-        } catch{ Write-Output "PowerOff not found"}
+        } catch{ Write-Error $_.Exception.Message}
     }
-    $result1 += "`r`n"
+    #exporting data to csv
+    $result1Object | Export-Csv -Path $pathcsv1 -NoTypeInformation -UseQuotes AsNeeded -Delimiter ';'
     if($totalSpace1 -ne 0){
-        send-MailMessage -To <receiver-1>,<receiver-2> -From <sender> -Subject "[Check VM] Workflow vRO " -Body "The following VMs are poweredoff since 6 months:`r`n<cluster-name>:`r`nSpace occupied: $($totalSpace1) GB`r`n$($result1)`r`n" -SmtpServer <ip-server-smtp> -Port 25
+        send-MailMessage -To <receiver-1>,<receiver-2> -From <sender> -Subject "[Check VM] Workflow vRO " -Body "The following VMs are poweredoff since 6 months:`r`n<cluster-name>:`r`nSpace occupied: $($totalSpace1) GB" -SmtpServer <ip-server-smtp> -Port 25 -Attachments $pathcsv
     }
     #Disconnect from vCenter
     Disconnect-VIserver -Server $inputs.vcenter -Force -Confirm:$false
