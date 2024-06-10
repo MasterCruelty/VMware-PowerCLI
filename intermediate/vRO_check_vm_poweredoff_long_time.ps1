@@ -38,7 +38,7 @@ function Handler($context, $inputs) {
     #exporting data to csv
     $result1Object | Export-Csv -Path $pathcsv1 -NoTypeInformation -UseQuotes AsNeeded -Delimiter ';'
     if($totalSpace1 -ne 0){
-        send-MailMessage -To <receiver-1>,<receiver-2> -From <sender> -Subject "[Check VM] Workflow vRO " -Body "The following VMs are poweredoff since 6 months:`r`n<cluster-name>:`r`nSpace occupied: $($totalSpace1) GB" -SmtpServer <ip-server-smtp> -Port 25 -Attachments $pathcsv
+        send-MailMessage -To <receiver-1>,<receiver-2> -From <sender> -Subject "[Check VM] Workflow vRO " -Body "The following VMs are poweredoff since 6 months:`r`n<cluster-name>:`r`nSpace occupied: $($totalSpace1) GB" -SmtpServer <ip-server-smtp> -Port 25 -Attachments $pathcsv1
     }
     #Disconnect from vCenter
     Disconnect-VIserver -Server $inputs.vcenter -Force -Confirm:$false
