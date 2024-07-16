@@ -7,16 +7,16 @@
 #Bypass certificati
 Set-PowerCLIConfiguration -InvalidCertificateAction:Ignore -Confirm:$false
     
-# Connettersi al server vCenter
+# Connect to vCenter
 Connect-VIServer -Server <vcsa-server> -user 'user' -password 'pwd'
 
-# Definire la lista di username
+# Define a list of usernames
 $usernames = @('user1','user2','user3','user4','user5','user_n')
 
-# Recuperare tutte le VM
+# Retrieve all VMs
 $vms = Get-VM
 
-# Filtrare le VM il cui custom attribute 'vm.owner' è contenuto nella lista di username
+# Filtering VMs by vm.owner custom attribute if it's in the usernames array.
 $filteredVMs = @()
 foreach ($vm in $vms) {
     $owner = Get-Annotation -Entity $vm -CustomAttribute 'vm.owner'
@@ -25,7 +25,7 @@ foreach ($vm in $vms) {
     }
 }
 
-# Stampare la lista delle VM filtrate
+# Print all VMs found
 $filteredVMs | Select-Object Name, 
                                 @{Name='Owner';Expression={$_ | Get-Annotation -CustomAttribute 'vm.owner' | Select-Object -ExpandProperty Value}}, 
                                 @{Name='CPU';Expression={$_.NumCpu}}, 
@@ -36,11 +36,11 @@ $filteredVMs | Select-Object Name,
                                 Format-Table -AutoSize
 
 
-#vm mancanti recupero info dal nome vm
+#Missing Vms, I get those by VM name
 $vmNames = @('vm1','vm2','vm3','vm_n')
 $vms = Get-VM -Name $vmNames
 
-# Creare una tabella con le informazioni desiderate
+# Create a new table with info required
 $vms | Select-Object Name,
 		      @{Name='Owner';Expression={$_ | Get-Annotation -CustomAttribute 'vm.owner' | Select-Object -ExpandProperty Value}},
                       @{Name='CPU';Expression={$_.NumCpu}}, 
@@ -50,5 +50,5 @@ $vms | Select-Object Name,
 					  @{Name='Folder';Expression={($_ | Get-Folder)}} |					  
                       Format-Table -AutoSize
 					  
-# Disconnettersi dal server vCenter
+# Disconnect from vCenter
 Disconnect-VIServer -Server <vcsa-server> -Confirm:$false
