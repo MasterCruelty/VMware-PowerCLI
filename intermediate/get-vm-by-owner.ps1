@@ -1,6 +1,8 @@
-#The following script return a list of VMs and main info about them by giving an array of username.
-#This is based on the fact you have a custom attribute named "vm.owner".
-#The rest of missed vms are looked manually on vcenter and then by giving them in an array, the script recover their info.
+<# 
+   The following script return a list of VMs and main info about them by giving an array of username.
+   This is based on the fact you have a custom attribute named "vm.owner".
+   The rest of missed vms are looked manually on vcenter and then by giving them in an array, the script recover their info.
+#>   
 
 #Bypass certificati
 Set-PowerCLIConfiguration -InvalidCertificateAction:Ignore -Confirm:$false
