@@ -22,6 +22,7 @@ function Handler($context, $inputs) {
         }
         $eventi = $vm | Get-VIEvent | Where-Object {
             ($_.FullFormattedMessage -match "^Created virtual machine") -or
+	    ($_.FullFormattedMessage -match "Reconfigure virtual machine") -or
             ($_.FullFormattedMessage -match "is starting") -and
             ($_.UserName -match "<OU-name>\\(.*)") -and
         }
